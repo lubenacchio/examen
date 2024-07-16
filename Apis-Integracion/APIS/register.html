@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Registro o Inicio de Sesión</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro o Inicio de Sesión</h1>
+        <div id="register-section">
+            <h2>Registro</h2>
+            <form id="register-form">
+                <div>
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div>
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div>
+                    <button type="submit">Registrar</button>
+                </div>
+            </form>
+            <p id="register-message"></p>
+            <p>¿Ya tienes una cuenta? <a href="#" id="toggle-login">Inicia sesión</a></p>
+        </div>
+
+        <div id="login-section" style="display: none;">
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <div>
+                    <label for="login-username">Usuario:</label>
+                    <input type="text" id="login-username" name="login-username" required>
+                </div>
+                <div>
+                    <label for="login-password">Contraseña:</label>
+                    <input type="password" id="login-password" name="login-password" required>
+                </div>
+                <div>
+                    <button type="submit">Iniciar Sesión</button>
+                </div>
+            </form>
+            <p id="login-message"></p>
+            <p>¿Aún no tienes una cuenta? <a href="#" id="toggle-register">Regístrate</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Función para cambiar entre secciones de registro y inicio de sesión
+        document.getElementById('toggle-login').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('register-section').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+        });
+
+        document.getElementById('toggle-register').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('register-section').style.display = 'block';
+        });
+
+        // Event listener para el formulario de registro
+        document.getElementById('register-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:8002/api/clientes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role: 'user' })
+                });
+                const data = await response.json();
+                document.getElementById('register-message').textContent = `Registro exitoso para el usuario ${username}`;
+                document.getElementById('register-form').reset(); // Limpiar el formulario después del registro
+            } catch (error) {
+                console.error('Error registrando usuario:', error);
+                document.getElementById('register-message').textContent = 'Error al registrar. Por favor, intenta de nuevo.';
+            }
+        });
+
+        // Event listener para el formulario de inicio de sesión
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch('http://localhost:8002/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                document.getElementById('login-message').textContent = `Inicio de sesión exitoso para el usuario ${username}`;
+                document.getElementById('login-form').reset(); // Limpiar el formulario después del inicio de sesión
+                // Aquí podrías redirigir al usuario a otra página después de iniciar sesión
+            } catch (error) {
+                console.error('Error iniciando sesión:', error);
+                document.getElementById('login-message').textContent = 'Error al iniciar sesión. Por favor, verifica tus credenciales.';
+            }
+        });
+    </script>
+</body>
+</html>

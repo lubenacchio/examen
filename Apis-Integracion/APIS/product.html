@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <title>Productos</title>
+</head>
+<body>
+    <h1>Productos</h1>
+    <div id="product-list"></div>
+    <script>
+        async function fetchProducts() {
+            const response = await fetch('http://localhost:8000/productos');
+            const products = await response.json();
+            displayProducts(products);
+        }
+
+        function displayProducts(products) {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = products.map(product => `
+                <div>
+                    <h2>${product.nombre}</h2>
+                    <p>${product.descripcion}</p>
+                    <p>Precio: ${product.precio}</p>
+                    <button onclick="addToCart(${product.id}, '${product.nombre}', ${product.precio})">Agregar al Carrito</button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(productId, name, price) {
+            // Aquí puedes agregar lógica para añadir el producto al carrito
+            alert(`Producto ${name} añadido al carrito`);
+        }
+
+        fetchProducts();
+    </script>
+</body>
+</html>

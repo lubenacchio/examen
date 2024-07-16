@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Carrito de Compras</title>
+</head>
+<body>
+    <h1>Carrito de Compras</h1>
+    <div id="cart-items"></div>
+    <div>
+        <button onclick="generateReceipt()">Generar Boleta</button>
+    </div>
+    <script>
+        const cartItems = [
+            { productId: 1, name: "Producto 1", price: 10.0, quantity: 2 },
+            { productId: 2, name: "Producto 2", price: 20.0, quantity: 1 }
+        ];
+
+        async function displayCartItems() {
+            const cartItemsDiv = document.getElementById('cart-items');
+            cartItemsDiv.innerHTML = cartItems.map(item => `
+                <div>
+                    <p>Nombre: ${item.name}</p>
+                    <p>Precio: ${item.price}</p>
+                    <p>Cantidad: ${item.quantity}</p>
+                </div>
+            `).join('');
+        }
+
+        async function generateReceipt() {
+            try {
+                const response = await fetch('http://localhost:8000/generar_boleta/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customer_id: 1,
+                        items: cartItems.map(item => ({ producto_id: item.productId, precio: item.price, cantidad: item.quantity })),
+                        order_id: 123
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                alert(JSON.stringify(data)); // Consider displaying receipt details on the page instead of an alert
+            } catch (error) {
+                console.error('Error generating receipt:', error);
+                alert('Error generating receipt. Please try again.');
+            }
+        }
+
+        displayCartItems();
+    </script>
+</body>
+</html>
